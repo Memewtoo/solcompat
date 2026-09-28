@@ -1,0 +1,5 @@
+[toolchain]
+anchor_version = "0.31.1"
+
+[workspace]
+members = ["programs/vault"]

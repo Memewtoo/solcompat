@@ -1,0 +1,5 @@
+{
+  "name": "vault-workspace",
+  "private": true,
+  "dependencies": { "@solana/web3.js": "1.98.4", "@coral-xyz/anchor": "0.29.0" }
+}

@@ -1,0 +1,22 @@
+[package]
+name = "solcompat-project"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Bounded Solana project discovery and evidence collection for SolCompat"
+documentation = "https://docs.rs/solcompat-project"
+keywords = ["solana", "anchor", "sbf", "compatibility"]
+categories = ["development-tools"]
+include = ["src/**", "Cargo.toml", "LICENSE"]
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+solcompat-core = { version = "0.1.0", path = "../solcompat-core" }
+
+[lints]
+workspace = true

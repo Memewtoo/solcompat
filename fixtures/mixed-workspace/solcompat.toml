@@ -1,0 +1,28 @@
+schema_version = 1
+
+[[programs]]
+id = "vault"
+manifest = "programs/vault/Cargo.toml"
+sbf_rust_version = "1.79.0"
+sbpf_arch = "v3"
+platform_tools_version = "1.53.0"
+cargo_build_sbf_version = "4.2.0"
+
+[[clients]]
+id = "indexer"
+manifest = "package.json"
+decoder_package = "@solana/web3.js"
+required_read_versions = ["legacy", "v0", "v1"]
+
+[[clients.rpc_reads]]
+id = "blocks"
+method = "getBlock"
+encoding = "json"
+transaction_details = "full"
+max_supported_transaction_version = 0
+
+[[idls]]
+id = "vault-idl"
+path = "idl/vault.json"
+client = "indexer"
+reader_package = "@coral-xyz/anchor"

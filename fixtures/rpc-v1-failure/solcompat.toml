@@ -1,0 +1,17 @@
+schema_version = 1
+
+[analysis]
+target = "local"
+
+[[clients]]
+id = "indexer"
+manifest = "package.json"
+decoder_package = "@solana/web3.js"
+required_read_versions = ["legacy", "v0", "v1"]
+
+[[clients.rpc_reads]]
+id = "blocks"
+method = "getBlock"
+encoding = "json"
+transaction_details = "full"
+max_supported_transaction_version = 0

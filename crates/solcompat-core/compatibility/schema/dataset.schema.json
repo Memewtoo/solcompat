@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SolCompat v0.1 compatibility dataset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "revision",
+    "engine_schema",
+    "records",
+    "rules"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "engine_schema": {
+      "const": 1
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "revision",
+          "rule_id",
+          "rule_name",
+          "verified_on",
+          "evidence_kind",
+          "sources",
+          "reviewed_versions",
+          "reviewed_encodings",
+          "methods",
+          "body_free_block_details",
+          "notes"
+        ],
+        "properties": {
+          "id": {
+            "const": "rpc-read-version-acceptance"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rule_id": {
+            "const": "SC201"
+          },
+          "rule_name": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "verified_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence_kind": {
+            "const": "upstream_documentation"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^https://\\S+$"
+            }
+          },
+          "reviewed_versions": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "legacy",
+                "v0",
+                "v1"
+              ]
+            }
+          },
+          "reviewed_encodings": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "json",
+                "jsonParsed",
+                "base64",
+                "base58"
+              ]
+            }
+          },
+          "methods": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "getBlock",
+                "getTransaction"
+              ]
+            }
+          },
+          "body_free_block_details": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "none",
+                "signatures"
+              ]
+            }
+          },
+          "notes": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "rule_name",
+          "revision",
+          "verified_on",
+          "sources",
+          "notes"
+        ],
+        "properties": {
+          "rule_id": {
+            "enum": [
+              "SC001",
+              "SC003",
+              "SC102",
+              "SC103",
+              "SC104",
+              "SC200",
+              "SC302",
+              "SC400"
+            ]
+          },
+          "rule_name": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "verified_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^https://\\S+$"
+            }
+          },
+          "notes": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    }
+  }
+}

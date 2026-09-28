@@ -1,0 +1,22 @@
+[package]
+name = "solcompat-core"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Compatibility data model and deterministic rule engine for SolCompat"
+documentation = "https://docs.rs/solcompat-core"
+keywords = ["solana", "compatibility", "sbf"]
+categories = ["development-tools"]
+include = ["src/**", "compatibility/**", "Cargo.toml", "LICENSE"]
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+semver.workspace = true
+
+[lints]
+workspace = true

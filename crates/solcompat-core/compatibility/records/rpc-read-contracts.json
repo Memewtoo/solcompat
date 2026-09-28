@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "revision": "2026-09-28.2",
+  "engine_schema": 1,
+  "records": [
+    {
+      "id": "rpc-read-version-acceptance",
+      "revision": 1,
+      "rule_id": "SC201",
+      "rule_name": "RPC transaction-version acceptance",
+      "verified_on": "2026-09-26",
+      "evidence_kind": "upstream_documentation",
+      "sources": [
+        "https://solana.com/docs/core/transactions/versioned-transactions",
+        "https://solana.com/docs/rpc/http/getblock",
+        "https://solana.com/docs/rpc/http/gettransaction",
+        "https://github.com/anza-xyz/kit/blob/HEAD/packages/rpc-api/src/getBlock.ts"
+      ],
+      "reviewed_versions": [
+        "legacy",
+        "v0",
+        "v1"
+      ],
+      "reviewed_encodings": [
+        "json",
+        "jsonParsed",
+        "base64",
+        "base58"
+      ],
+      "methods": [
+        "getBlock",
+        "getTransaction"
+      ],
+      "body_free_block_details": [
+        "none",
+        "signatures"
+      ],
+      "notes": "Request acceptance only. No decoder or live endpoint capability is established. Explicit omission accepts legacy only. Accounts-only mode is not evaluated in this revision. Mutable upstream URLs are documentation references, not pinned implementation evidence."
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "SC001",
+      "rule_name": "Program Rust compiler requirement",
+      "revision": 1,
+      "verified_on": "2026-09-26",
+      "sources": [
+        "https://doc.rust-lang.org/cargo/reference/rust-version.html"
+      ],
+      "notes": "Compares a package rust-version with an explicitly selected SBF compiler version. A host rustc observation is not substituted for the SBF compiler."
+    },
+    {
+      "rule_id": "SC003",
+      "rule_name": "Anchor CLI and program crate alignment",
+      "revision": 1,
+      "verified_on": "2026-09-27",
+      "sources": [
+        "https://www.anchor-lang.com/docs/updates/release-notes/1-0-2",
+        "https://www.anchor-lang.com/docs/updates/release-notes/1-2-0"
+      ],
+      "notes": "Compares the selected Anchor CLI with resolved anchor-lang. Anchor release guidance updates the CLI and framework packages together; mismatched release lines are advisory warnings."
+    },
+    {
+      "rule_id": "SC102",
+      "rule_name": "Program bytecode deployment eligibility",
+      "revision": 1,
+      "verified_on": "2026-09-26",
+      "sources": [
+        "https://github.com/anza-xyz/cargo-build-sbf"
+      ],
+      "notes": "Reads supplied ELF metadata. Deployment policy is evaluated only for an explicit dated or conditional target."
+    },
+    {
+      "rule_id": "SC103",
+      "rule_name": "sBPF build architecture prerequisites",
+      "revision": 1,
+      "verified_on": "2026-09-26",
+      "sources": [
+        "https://github.com/anza-xyz/cargo-build-sbf"
+      ],
+      "notes": "The reviewed sBPFv3 recipe requires cargo-build-sbf 4.2+, platform-tools 1.53+, Pinocchio 0.10+ where used, and solana-define-syscall 2.3+ where used."
+    },
+    {
+      "rule_id": "SC104",
+      "rule_name": "Pinocchio source API alignment",
+      "revision": 2,
+      "verified_on": "2026-09-28",
+      "sources": [
+        "https://docs.rs/crate/pinocchio/0.9.2/source/README.md",
+        "https://docs.rs/pinocchio/0.10.2/pinocchio/",
+        "https://github.com/anza-xyz/pinocchio/releases/tag/pinocchio%40v0.11.0",
+        "https://docs.rs/pinocchio/0.11.2/pinocchio/macro.program_entrypoint.html"
+      ],
+      "notes": "Checks two Pinocchio source boundaries against the resolved release: 0.10 replaces Pubkey/AccountInfo with Address/AccountView, and 0.11 requires a mutable AccountView slice and moves resize support behind explicit traits/features."
+    },
+    {
+      "rule_id": "SC200",
+      "rule_name": "Transaction decoder version support",
+      "revision": 1,
+      "verified_on": "2026-09-26",
+      "sources": [
+        "https://solana.com/upgrades/larger-transaction-sizes"
+      ],
+      "notes": "Reviewed V1 read support: @solana/web3.js 1.99.x, @solana/web3.js 3.0.0-rc.3 through 3.x, and @solana/kit 8.x. Exact resolved versions are required."
+    },
+    {
+      "rule_id": "SC302",
+      "rule_name": "Anchor crate version alignment",
+      "revision": 1,
+      "verified_on": "2026-09-26",
+      "sources": [
+        "https://www.anchor-lang.com/docs/updates/release-notes/0-31-0"
+      ],
+      "notes": "Compares resolved anchor-lang and anchor-spl versions. Mismatches are advisory because compatibility can be release-specific."
+    },
+    {
+      "rule_id": "SC400",
+      "rule_name": "Anchor IDL reader compatibility",
+      "revision": 1,
+      "verified_on": "2026-09-26",
+      "sources": [
+        "https://www.anchor-lang.com/docs/updates/release-notes/0-30-0",
+        "https://www.anchor-lang.com/docs/updates/release-notes/0-31-0"
+      ],
+      "notes": "Recognizes legacy Anchor IDLs and the metadata.spec IDL introduced with Anchor 0.30. Unknown schemas and unreviewed reader combinations remain unknown."
+    }
+  ]
+}

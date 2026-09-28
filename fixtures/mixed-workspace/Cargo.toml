@@ -1,0 +1,7 @@
+[workspace]
+members = ["programs/vault"]
+resolver = "2"
+
+[workspace.dependencies]
+anchor-lang = "0.31.1"
+anchor-spl = "0.30.1"

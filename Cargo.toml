@@ -1,0 +1,64 @@
+[package]
+name = "solcompat"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+description = "Evidence-based compatibility checks for Solana programs and clients"
+readme = "README.md"
+documentation = "https://docs.rs/solcompat"
+keywords = ["solana", "anchor", "sbf", "compatibility", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+include = [
+    "src/**",
+    "Cargo.toml",
+    "Cargo.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "docs/**",
+    "schemas/**",
+    "crates/solcompat-core/compatibility/**",
+]
+publish.workspace = true
+
+[workspace]
+members = ["crates/solcompat-core", "crates/solcompat-project"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/Memewtoo/solcompat"
+license = "Apache-2.0"
+publish = ["crates-io"]
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+semver.workspace = true
+solcompat-core = { version = "0.1.0", path = "crates/solcompat-core" }
+solcompat-project = { version = "0.1.0", path = "crates/solcompat-project" }
+
+[lints]
+workspace = true
+
+[workspace.dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.6", features = ["derive"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.10.9"
+toml = "0.8.23"
+semver = "1.0.28"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+strip = "symbols"

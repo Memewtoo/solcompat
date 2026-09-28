@@ -1,0 +1,824 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SolCompat report v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/report"
+    },
+    {
+      "$ref": "#/$defs/error_report"
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "strings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "maximum": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "const": "omitted"
+        },
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "pointer",
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "pointer": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "declared",
+            "locked",
+            "observed",
+            "asserted"
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "method",
+        "encoding",
+        "transaction_details",
+        "max_supported_transaction_version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "getBlock",
+            "getTransaction"
+          ]
+        },
+        "encoding": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "transaction_details": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_supported_transaction_version": {
+          "$ref": "#/$defs/maximum"
+        }
+      }
+    },
+    "client": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "manifest",
+        "dependencies",
+        "resolved_dependencies",
+        "decoder_package",
+        "required_read_versions",
+        "rpc_reads",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "manifest": {
+          "type": "string"
+        },
+        "dependencies": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "resolved_dependencies": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "decoder_package": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required_read_versions": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/strings"
+            }
+          ]
+        },
+        "rpc_reads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/read"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "program": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "manifest",
+        "framework",
+        "candidate_reason",
+        "rust_version",
+        "dependencies",
+        "resolved_dependencies",
+        "anchor_cli_version",
+        "sbf_rust_version",
+        "sbpf_arch",
+        "platform_tools_version",
+        "cargo_build_sbf_version",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "manifest": {
+          "type": "string"
+        },
+        "framework": {
+          "enum": [
+            "anchor",
+            "pinocchio",
+            "native",
+            "custom"
+          ]
+        },
+        "candidate_reason": {
+          "type": "string"
+        },
+        "rust_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dependencies": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "resolved_dependencies": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "anchor_cli_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sbf_rust_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sbpf_arch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "platform_tools_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cargo_build_sbf_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "idl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "client",
+        "reader_package",
+        "schema",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "client": {
+          "type": "string"
+        },
+        "reader_package": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "program",
+        "loader",
+        "operation",
+        "elf_machine",
+        "elf_flags",
+        "sbpf_version",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "program": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "loader": {
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "deploy",
+            "upgrade",
+            "finalize",
+            "execute"
+          ]
+        },
+        "elf_machine": {
+          "type": "integer"
+        },
+        "elf_flags": {
+          "type": "integer"
+        },
+        "sbpf_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "version",
+        "executable",
+        "status"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "suppression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule",
+        "subject",
+        "reason"
+      ],
+      "properties": {
+        "rule": {
+          "pattern": "^SC[0-9]{3}$"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "remediation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "location",
+        "steps",
+        "example",
+        "verification"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "steps": {
+          "$ref": "#/$defs/strings"
+        },
+        "example": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "verification": {
+          "$ref": "#/$defs/strings"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "rule_name",
+        "rule_revision",
+        "subject",
+        "operation",
+        "conditional",
+        "outcome",
+        "severity",
+        "title",
+        "summary",
+        "explanation",
+        "evidence",
+        "sources",
+        "remediation",
+        "suppression"
+      ],
+      "properties": {
+        "rule_id": {
+          "enum": [
+            "SC001",
+            "SC003",
+            "SC100",
+            "SC102",
+            "SC103",
+            "SC200",
+            "SC201",
+            "SC302",
+            "SC400",
+            "UP100",
+            "UP101",
+            "UP102",
+            "UP103",
+            "UP104",
+            "UP105",
+            "UP200",
+            "SC104",
+            "UP106",
+            "UP107"
+          ]
+        },
+        "rule_name": {
+          "type": "string"
+        },
+        "rule_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subject": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "conditional": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "enum": [
+            "pass",
+            "finding",
+            "unknown",
+            "not_applicable",
+            "skipped"
+          ]
+        },
+        "severity": {
+          "enum": [
+            null,
+            "info",
+            "warning",
+            "error"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "sources": {
+          "$ref": "#/$defs/strings"
+        },
+        "remediation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/remediation"
+            }
+          ]
+        },
+        "suppression": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/suppression"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "finding"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "severity": {
+                "enum": [
+                  "info",
+                  "warning",
+                  "error"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "severity": {
+                "const": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "passed",
+        "errors",
+        "warnings",
+        "info",
+        "unknown",
+        "not_applicable",
+        "skipped",
+        "suppressed"
+      ],
+      "properties": {
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "info": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_applicable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "suppressed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "command",
+        "analysis_mode",
+        "target",
+        "target_digest",
+        "dataset",
+        "project",
+        "results",
+        "counts",
+        "policy",
+        "exit_code"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "command": {
+          "enum": [
+            "check",
+            "inspect",
+            "upgrade"
+          ]
+        },
+        "analysis_mode": {
+          "enum": [
+            "static",
+            "inventory",
+            "upgrade-advice"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "target_digest": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/digest"
+            }
+          ]
+        },
+        "dataset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "revision",
+            "digest"
+          ],
+          "properties": {
+            "revision": {
+              "type": "string"
+            },
+            "digest": {
+              "$ref": "#/$defs/digest"
+            }
+          }
+        },
+        "project": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "clients",
+            "programs",
+            "idls",
+            "artifacts",
+            "tools"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "clients": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/client"
+              }
+            },
+            "programs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/program"
+              }
+            },
+            "idls": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/idl"
+              }
+            },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/artifact"
+              }
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/tool"
+              }
+            }
+          }
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/result"
+          }
+        },
+        "counts": {
+          "$ref": "#/$defs/counts"
+        },
+        "policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "deny_warnings",
+            "deny_unknown"
+          ],
+          "properties": {
+            "deny_warnings": {
+              "type": "boolean"
+            },
+            "deny_unknown": {
+              "type": "boolean"
+            }
+          }
+        },
+        "exit_code": {
+          "enum": [
+            0,
+            1
+          ]
+        }
+      }
+    },
+    "error_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "command",
+        "exit_code",
+        "error"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "command": {
+          "enum": [
+            "check",
+            "inspect",
+            "upgrade"
+          ]
+        },
+        "exit_code": {
+          "const": 2
+        },
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "message"
+          ],
+          "properties": {
+            "kind": {
+              "const": "input_or_analysis_error"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
