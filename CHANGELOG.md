@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 — 2026-09-29
+
 - Made the default scan discover direct JavaScript and TypeScript `getBlock` and `getTransaction` calls, including literal request options and source-line evidence.
 - Added ancestor Cargo workspace dependency and lockfile resolution for checks started inside nested program directories.
 - Made SC200 fail deterministic decoder ranges that exclude reviewed Transaction V1 support, such as `@solana/kit: ^7`.
@@ -11,8 +13,6 @@
 - Added Pinocchio source API alignment against the resolved release, including the 0.9-to-0.10 `Pubkey`/`AccountInfo` migration and the 0.10-to-0.11 mutable `AccountView` entrypoint boundary.
 - Added Anchor upgrade source findings for the 0.31 discriminator constant migration and the 1.x `CpiContext` program-address migration.
 - Reworked README and supporting documentation around current behavior, compatibility-data maintenance, and future framework release intake.
-
-## 0.1.0 — 2026-09-27
 
 - Added deterministic Cargo, Anchor, Pinocchio, native-program, and npm client discovery.
 - Added declared-versus-resolved dependency evidence from Cargo.lock, npm package-lock v2/v3, and supplied Cargo metadata.
