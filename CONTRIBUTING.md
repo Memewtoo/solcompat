@@ -71,9 +71,19 @@ Before opening a pull request, run:
     cargo test --workspace --locked --offline
     cargo clippy --workspace --all-targets --locked --offline -- -D warnings
     python3 scripts/check-schemas.py
+    python3 scripts/check-maintenance.py
+    python3 scripts/test-maintenance.py
     scripts/release-check.sh
 
 Please also read the compact and detailed terminal reports. A useful finding should tell a developer what was detected, why it matters, where to make the change, and how to verify it.
+
+## Keeping the repository consistent
+
+Register a new rule in `crates/solcompat-core/src/catalog.rs`, then add its evaluator and metadata at the declared owner. Core tests check catalog identities and dataset ownership; dataset loading rejects missing or unsupported static rules. A binary-owned rule must have a positive revision in the catalog. Update applicable schema enums when adding a new identity or evidence kind.
+
+The maintenance check validates coordinated package versions, internal dependency requirements, and local public documentation links. The release gate also inspects every crate and the archive for current Rust modules, documentation, schemas, licenses, and private planning files. Add new public guides under `docs/`; the archive includes that directory automatically. Keep private plans out of package include lists and public links.
+
+Read [the publishing guide](docs/PUBLISHING.md) for version updates, release validation, and recovery after partial publication. The full release gate requires registry access; an offline test run alone does not establish publish readiness.
 
 ## Scope
 

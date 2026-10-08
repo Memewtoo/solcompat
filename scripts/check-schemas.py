@@ -40,6 +40,14 @@ def main():
         reports.validate(json.loads(completed.stdout))
         detailed = subprocess.run(args + ["--detailed"], capture_output=True, check=False)
         assert (detailed.stdout, detailed.returncode) == (completed.stdout, completed.returncode)
+    for fixture, expected in (("rpc-v1-pass", 0), ("mixed-workspace", 1)):
+        args = [str(BINARY), "upgrade", "--path", str(ROOT / "fixtures" / fixture), "--format", "json"]
+        completed = subprocess.run(args, capture_output=True, check=False)
+        assert completed.returncode == expected, completed.stderr
+        assert not completed.stderr, completed.stderr
+        reports.validate(json.loads(completed.stdout))
+        detailed = subprocess.run(args + ["--detailed"], capture_output=True, check=False)
+        assert (detailed.stdout, detailed.returncode) == (completed.stdout, completed.returncode)
     for args, expected in [
         (["inspect", "--path", "fixtures/rpc-v1-failure"], 0),
         (["check", "--path", "fixtures/rpc-v1-pass", "--target", "unsupported"], 2),

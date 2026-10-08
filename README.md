@@ -197,6 +197,8 @@ Contributions that add support for new Solana, Agave, Anchor, Pinocchio, or clie
     cargo test --workspace --locked --offline
     cargo clippy --workspace --all-targets --locked --offline -- -D warnings
     python3 scripts/check-schemas.py
+    python3 scripts/check-maintenance.py
+    python3 scripts/test-maintenance.py
     scripts/release-check.sh
 
 Read [the architecture guide](docs/ARCHITECTURE.md) to follow model construction, field sources, rule evaluation, and reporting.

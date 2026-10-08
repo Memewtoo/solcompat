@@ -4,14 +4,11 @@ set -euo pipefail
 project_root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$project_root"
 
+version="$(python3 scripts/check-maintenance.py --version)"
 cargo build --release --locked
 
 binary="$project_root/target/release/solcompat"
-version="$("$binary" --version | awk '{print $2}')"
-if [[ -z "$version" || "$version" == *-dev* ]]; then
-  echo "release binary has an invalid version: $version" >&2
-  exit 1
-fi
+test "$("$binary" --version)" = "solcompat $version"
 
 host="$(rustc -vV | awk '/^host:/ {print $2}')"
 archive_root="solcompat-v${version}-${host}"
@@ -22,7 +19,7 @@ staging="$staging_parent/$archive_root"
 mkdir -p "$staging/docs" "$staging/schemas" "$staging/compatibility/records" "$staging/compatibility/schema"
 cp "$binary" "$staging/solcompat"
 cp README.md CHANGELOG.md CONTRIBUTING.md "$staging/"
-cp docs/CI.md docs/LIMITATIONS.md docs/PUBLISHING.md docs/RULES.md docs/SC201.md docs/SUPPORTED_INPUTS.md "$staging/docs/"
+cp docs/*.md "$staging/docs/"
 if [[ -f LICENSE ]]; then
   cp LICENSE "$staging/"
 fi
@@ -45,6 +42,7 @@ EOF
 mkdir -p dist
 archive="dist/${archive_root}.tar.gz"
 tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner -C "$staging_parent" -cf - "$archive_root" | gzip -n > "$archive"
+python3 scripts/check-maintenance.py --archive "$archive"
 sha256sum "$archive" > dist/SHA256SUMS
 
 echo "$archive"

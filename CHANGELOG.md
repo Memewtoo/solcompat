@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Derive release versions from Cargo metadata; validate coordinated crate requirements and annotated release tags. CI artifact names and install/archive smoke tests no longer assume 0.1.0.
+- Add maintenance checks for public documentation links, packaged modules/docs/schemas/licenses, and private-plan exclusions. Extend schema validation to upgrade reports and include rustdoc in the release gate.
+- Document release version updates and recovery after partial crates.io publication.
+
 - Evaluate conventional Pinocchio `no-entrypoint` and test guards under an explicit package-default, non-test source profile. Follow local default feature references, exclude test-only source, and retain uncertainty for unsupported conditions. SC104 revision 6 records this scoped source selection.
 
 - Discover program candidates through conditionally declared default-path modules, without treating those modules as selected source. Missing or conditional sibling modules no longer hide reachable entrypoints. This restores discovery for the World Cup and Gacha Pinocchio layouts.
