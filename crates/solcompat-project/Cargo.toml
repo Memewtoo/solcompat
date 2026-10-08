@@ -19,7 +19,7 @@ toml.workspace = true
 semver.workspace = true
 syn = { version = "2.0.119", features = ["full", "visit"] }
 proc-macro2 = { version = "1.0.107", features = ["span-locations"] }
-solcompat-core = { version = "0.1.0", path = "../solcompat-core" }
+solcompat-core = { version = "0.1.1", path = "../solcompat-core" }
 
 [lints]
 workspace = true

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.1 — 2026-10-08
+
 - Derive release versions from Cargo metadata; validate coordinated crate requirements and annotated release tags. CI artifact names and install/archive smoke tests no longer assume 0.1.0.
 - Add maintenance checks for public documentation links, packaged modules/docs/schemas/licenses, and private-plan exclusions. Extend schema validation to upgrade reports and include rustdoc in the release gate.
 - Document release version updates and recovery after partial crates.io publication.
