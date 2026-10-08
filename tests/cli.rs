@@ -527,7 +527,7 @@ fn captured_cargo_metadata_resolves_an_ambiguous_lockfile() {
             {"id":"vault 0.1.0", "name":"vault", "version":"0.1.0", "manifest_path":manifest},
             {"id":"anchor-lang 0.31.1", "name":"anchor-lang", "version":"0.31.1", "source":"registry+https://github.com/rust-lang/crates.io-index", "manifest_path":"/registry/anchor-lang/Cargo.toml"}
         ],
-        "resolve": {"nodes":[{"id":"vault 0.1.0", "deps":[{"name":"anchor_lang", "pkg":"anchor-lang 0.31.1"}]}]}
+        "resolve": {"nodes":[{"id":"vault 0.1.0", "deps":[{"name":"anchor_lang", "pkg":"anchor-lang 0.31.1", "dep_kinds":[{"kind":null,"target":null}]}]}]}
     });
     fs::write(project.0.join("metadata.json"), metadata.to_string()).unwrap();
     let before = report(&run(&project.0, &["--format", "json"]));
@@ -775,7 +775,9 @@ fn direct_rpc_source_activates_transaction_v1_checks_without_config() {
     .unwrap();
     fs::write(
         project.0.join("src/index.ts"),
-        r#"export async function read(rpc: any, slot: bigint) {
+        r#"import { createSolanaRpc } from "@solana/kit";
+const rpc = createSolanaRpc("http://localhost:8899");
+export async function read(slot: bigint) {
   return rpc.getBlock(slot, {
     encoding: "json",
     transactionDetails: "full",
@@ -818,7 +820,7 @@ fn nested_program_uses_ancestor_workspace_requirements_and_lockfile() {
     .unwrap();
     fs::write(
         workspace.0.join("Cargo.lock"),
-        "version = 3\n[[package]]\nname = \"anchor-lang\"\nversion = \"0.31.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n",
+        "version = 3\n[[package]]\nname = \"anchor-lang\"\nversion = \"0.31.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n[[package]]\nname = \"counter\"\nversion = \"0.1.0\"\ndependencies = [\"anchor-lang\"]\n",
     )
     .unwrap();
     fs::write(
@@ -859,7 +861,7 @@ fn upgrade_advisor_reports_only_crossed_anchor_boundaries() {
     .unwrap();
     fs::write(
         project.0.join("Cargo.lock"),
-        "version = 3\n[[package]]\nname = \"anchor-lang\"\nversion = \"0.30.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n",
+        "version = 3\n[[package]]\nname = \"anchor-lang\"\nversion = \"0.30.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n[[package]]\nname = \"legacy-anchor\"\nversion = \"0.1.0\"\ndependencies = [\"anchor-lang\"]\n",
     )
     .unwrap();
     fs::write(
@@ -977,7 +979,7 @@ fn pinocchio_source_syntax_is_checked_against_resolved_release() {
         fs::write(
             project.0.join("Cargo.lock"),
             format!(
-                "version = 3\n[[package]]\nname = \"pinocchio\"\nversion = \"{version}\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n"
+                "version = 3\n[[package]]\nname = \"pinocchio\"\nversion = \"{version}\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n[[package]]\nname = \"pin-syntax\"\nversion = \"0.1.0\"\ndependencies = [\"pinocchio\"]\n"
             ),
         )
         .unwrap();
