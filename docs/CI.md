@@ -55,7 +55,7 @@ The example assumes the verified archive has been restored into `tools/`. Downlo
 
 A default check fails on incompatibilities and succeeds when it finds only warnings or missing evidence. This is a practical starting point for an existing project.
 
-Add `--deny-unknown` after the repository has supplied the evidence needed by its applicable rules. Add `--deny-warnings` only when advisory migration and version-alignment findings should block a merge. Keep conditional or dated targets explicit rather than allowing a CI environment to choose them implicitly.
+Add `--deny-unknown` after the repository has supplied the evidence needed by its applicable rules. This policy also fails skipped checks. Add `--deny-warnings` only when advisory migration and version-alignment findings should block a merge. Keep conditional or dated targets explicit rather than allowing a CI environment to choose them implicitly.
 
 Planned upgrades work well as a separate job:
 
@@ -67,3 +67,7 @@ solcompat upgrade \
 ```
 
 Review a SolCompat dependency update in the same way as a compiler or framework update: read the changelog, note the new dataset revision, and inspect newly applicable findings before merging it.
+
+A suppression must match exactly one finding by rule and subject. For RPC checks the subject includes the read ID, such as `indexer/blocks`. Ambiguous or stale suppressions fail with exit code 2; they cannot silently hide one of several findings. SC100 is not suppressible.
+
+When CI asks SolCompat to build, set a suitable deadline, for example `solcompat --build --build-timeout-seconds 600`. The resulting static checks use a fresh post-build inventory. Do not also pass a previously captured Cargo metadata file.

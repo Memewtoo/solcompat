@@ -19,6 +19,8 @@ Please avoid reporting a version as incompatible only because it is old. SolComp
 
 ## Adding or changing a rule
 
+Read [the architecture guide](docs/ARCHITECTURE.md) for collection entry points, field sources, and the path from evidence to a finding.
+
 Start by deciding where the change belongs:
 
 - A current-state rule (`SC...`) checks whether the source and configuration agree with the versions already resolved by the project.

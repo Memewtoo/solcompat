@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- Evaluate conventional Pinocchio `no-entrypoint` and test guards under an explicit package-default, non-test source profile. Follow local default feature references, exclude test-only source, and retain uncertainty for unsupported conditions. SC104 revision 6 records this scoped source selection.
+
+- Discover program candidates through conditionally declared default-path modules, without treating those modules as selected source. Missing or conditional sibling modules no longer hide reachable entrypoints. This restores discovery for the World Cup and Gacha Pinocchio layouts.
+
+- Fixed Pinocchio source-detector regressions: recognize the account parameter by its position/type regardless of its name, and retain unconditional signatures beside conditional entrypoint imports/macros. Conditional framework patterns remain unresolved. Clarified that SC100 build success does not clear SC104 source-selection uncertainty.
+
+- Resolve Cargo dependencies through the program's direct lockfile edges and canonical registry identity; retain workspace, lockfile, and captured metadata provenance. Unsupported or ambiguous dependency identities remain unresolved.
+- Resolve nested npm installations for the owning client, checking upstream package identity and supported manifest requirements.
+- Parse Rust syntax and declared modules so comments, string literals, and unlinked files do not become framework migration evidence. Conditional or unparseable source leaves SC104 unresolved.
+- Bind direct RPC reads to supported SDK imports and constructor assignments; dynamic options, duplicate keys, spreads, shadowed or unrelated receivers remain unknown. Decoder inference follows the bound SDK rather than package priority.
+- Escape terminal controls in target labels and input-error messages.
+- Extend the schema-1 evidence-kind enum for resolution and source observations, including framework kinds already emitted by earlier releases. Existing field shapes remain unchanged.
+- Reject contradictory no-read contracts and ambiguous suppressions. Make `--deny-unknown` fail skipped checks consistently with the report verdict.
+- Bound opt-in process output and execution time. Add `--build-timeout-seconds` with a 30-minute default, reject stale imported metadata during builds, and recollect project evidence after the build.
+- Revise affected rule identities' revision numbers and bundled data revision to `2026-10-08.4`; report and configuration remain schema 1. Reviewed upstream capability boundaries are unchanged.
+
+- Added named collection/enrichment stages, typed resolution and source observations, and focused precedence/provenance tests without changing schema 1.
+- Moved upgrade advice into solcompat-core, split current-state evaluators by rule family, and centralized rule ownership, suppressions, counts, exit policy, and semantic verdict selection.
+- Separated CLI argument definitions and application orchestration from output handling.
+
+- Split project collection into dedicated modules while preserving the public API, serialized reports, check outcomes, and command behavior.
+- Added a contributor architecture guide covering model construction, field sources, precedence, evaluation, and tool execution.
+
 ## 0.1.0 — 2026-09-29
 
 - Made the default scan discover direct JavaScript and TypeScript `getBlock` and `getTransaction` calls, including literal request options and source-line evidence.

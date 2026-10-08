@@ -78,15 +78,19 @@ Pinocchio has two source-level migrations covered today:
 
 A program on 0.9 receives guidance for both migration steps. If the source already uses an API that its resolved Pinocchio version cannot provide, SolCompat reports an error.
 
+Pinocchio checks understand the conventional `no-entrypoint` gate using package default features and exclude test-only code. Declaring the feature alone does not disable the entrypoint. Custom feature flags are not inferred; the detailed result states the source profile used.
+
 ### Transaction V1 clients
 
-SolCompat finds direct JavaScript and TypeScript calls to `getBlock` and `getTransaction` when their options are written as literals. It checks both sides of Transaction V1 support:
+SolCompat finds direct JavaScript and TypeScript calls to `getBlock` and `getTransaction` when their options are written as literals. The automatic path binds supported SDK imports and local constructor assignments. Wrappers, unbound receivers, and dynamic options may need configuration. It checks both sides of Transaction V1 support:
 
 1. Does the RPC request accept V1 through `maxSupportedTransactionVersion`?
 2. Can the resolved client package decode V1 responses?
 
 For example:
 
+    import { createSolanaRpc } from "@solana/kit";
+    const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
     const block = await rpc.getBlock(slot, {
       encoding: "json",
       transactionDetails: "full",
@@ -130,14 +134,14 @@ Or let SolCompat run a single detected program build:
 
     solcompat --build
 
-Builds are opt-in because the underlying tools can create files and download dependencies.
+Builds are opt-in because the underlying tools can create files and download dependencies. SolCompat checks the resulting files again after the build, including any new lockfile. The default deadline is 30 minutes; for example, `solcompat --build --build-timeout-seconds 600` allows ten minutes.
 
-If a Cargo lockfile contains more than one version of a dependency, capture the resolved graph:
+If lockfile dependency edges cannot identify the program’s dependency, capture the resolved graph:
 
     cargo metadata --format-version 1 --locked > solcompat-metadata.json
     solcompat --cargo-metadata solcompat-metadata.json
 
-Keep the captured file inside the project selected by `--path`.
+Keep the captured file inside the project selected by `--path`. Run this as a separate check after building; `--cargo-metadata` and `--build` cannot be combined.
 
 ## Understanding the report
 
@@ -195,13 +199,14 @@ Contributions that add support for new Solana, Agave, Anchor, Pinocchio, or clie
     python3 scripts/check-schemas.py
     scripts/release-check.sh
 
+Read [the architecture guide](docs/ARCHITECTURE.md) to follow model construction, field sources, rule evaluation, and reporting.
+
 The workspace contains three packages:
 
-- `solcompat` provides the CLI, upgrade advice, and report rendering.
-- `solcompat-core` contains the report model, compatibility data, and rule engine.
+- `solcompat` provides the CLI, application orchestration, and report rendering.
+- `solcompat-core` contains the report model, compatibility data, current-state rules, and upgrade advice.
 - `solcompat-project` discovers projects and collects local evidence.
 
 ## License
 
 SolCompat is licensed under the [Apache License 2.0](LICENSE).
-

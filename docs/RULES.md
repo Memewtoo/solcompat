@@ -18,7 +18,7 @@ SolCompat needs the resolved crate version from `Cargo.lock` or captured Cargo m
 
 ### SC100 — SBF program build
 
-SC100 runs only when you pass `--build`. For a single detected program, SolCompat runs `anchor build` for Anchor projects and `cargo build-sbf --manifest-path <manifest>` for Pinocchio or native Rust programs. A successful command proves that invocation completed; it does not prove deployment or runtime behavior.
+SC100 runs only when you pass `--build`. For a single detected program, SolCompat runs `anchor build` for Anchor projects and `cargo build-sbf --manifest-path <manifest>` for Pinocchio or native Rust programs. SolCompat recollects files after the invocation, so version checks use any lockfile it created. The default build deadline is 30 minutes; use `--build-timeout-seconds` to change it. A successful command proves that invocation completed; it does not prove deployment or runtime behavior.
 
 ### SC102 — SBF artifact deployment eligibility
 
@@ -30,7 +30,7 @@ SC103 applies when the project explicitly selects `sbpf_arch = "v3"`. The review
 
 ### SC104 — Pinocchio source API alignment
 
-SC104 compares the resolved Pinocchio version with recognizable Rust source patterns in the program's `src/` directory.
+SC104 compares the resolved Pinocchio version with parsed Rust source patterns in the library and its declared modules.
 
 | Pinocchio line | Expected entrypoint types |
 |---|---|
@@ -38,7 +38,9 @@ SC104 compares the resolved Pinocchio version with recognizable Rust source patt
 | 0.10.x | `&Address`, `&[AccountView]` |
 | 0.11.x and newer reviewed releases | `&Address`, `&mut [AccountView]` |
 
-When the syntax conflicts with the resolved version, SolCompat reports the migration needed at that boundary. Aliases, generated code, macros, and custom wrapper types may require manual review because a text scan cannot identify their meaning reliably.
+When the syntax conflicts with the resolved version, SolCompat reports the migration needed at that boundary. Aliases, generated code, macros, and custom wrapper types may require manual review because syntax parsing cannot establish semantic type identity. Unsupported conditional selection or unparseable modules leave the source alignment check unresolved.
+
+Pinocchio SC104 evaluates `cfg(test)` and `cfg(feature = "no-entrypoint")` (including `not`, `all`, and `any`) under a **package-default, non-test source profile**. It follows local feature references from `[features].default`; declaring `no-entrypoint = []` alone leaves that feature disabled. Test-only source is excluded. If defaults enable `no-entrypoint`, the excluded entrypoint cannot establish a pass. Other feature gates, target conditions, and `cfg_attr` remain unresolved when they affect reviewed source. Custom build flags and dependency feature unification are not inferred; this profile is not proof of the deployed build.
 
 ## Client and RPC checks
 
