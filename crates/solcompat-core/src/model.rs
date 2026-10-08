@@ -14,6 +14,9 @@ pub enum Omitted {
     Explicit,
 }
 
+/// One configured or textually observed RPC request. A missing maximum
+/// means unresolved evidence; an explicit omitted maximum means an observed or
+/// asserted omission. Neither establishes decoder capability.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct RpcRead {
@@ -24,6 +27,8 @@ pub struct RpcRead {
     pub max_supported_transaction_version: Option<RpcMaximum>,
 }
 
+/// Source reference and byte digest. Some kind strings identify recognized
+/// framework syntax; evidence is not a full per-field provenance graph.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Evidence {
@@ -33,6 +38,9 @@ pub struct Evidence {
     pub digest: String,
 }
 
+/// Collected npm client inputs. Constructed by `collect_client` in
+/// solcompat-project/src/client.rs, enriched by collect.rs and source/rpc.rs.
+/// Declared requirements and exact resolved versions have separate fields.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Client {
@@ -49,6 +57,13 @@ pub struct Client {
     pub evidence: Vec<Evidence>,
 }
 
+/// Collected program inputs consumed by the rule engine.
+///
+/// The constructor is `collect_program` in solcompat-project/src/program.rs.
+/// That function creates the struct directly; no model-owned builder is needed.
+/// collect.rs applies configuration, metadata, and Anchor.toml enrichment;
+/// project/tools.rs fills absent tool selections from explicitly requested probes.
+/// See docs/ARCHITECTURE.md for the field-source and precedence tables.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Program {
@@ -68,6 +83,8 @@ pub struct Program {
     pub evidence: Vec<Evidence>,
 }
 
+/// An explicitly bound IDL and its reader relationship, parsed in
+/// solcompat-project/src/idl.rs. IDLs are not automatically assigned to clients.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct IdlInput {
@@ -79,6 +96,8 @@ pub struct IdlInput {
     pub evidence: Vec<Evidence>,
 }
 
+/// An existing ELF header inspected in solcompat-project/src/artifact.rs.
+/// Its byte identity does not prove that the current source produced it.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Artifact {
@@ -93,6 +112,8 @@ pub struct Artifact {
     pub evidence: Vec<Evidence>,
 }
 
+/// An opt-in installed executable observation from solcompat-project::probe_tools.
+/// Selected tool versions in configuration are distinct from these observations.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ToolObservation {
@@ -210,6 +231,9 @@ pub struct DatasetIdentity {
     pub digest: String,
 }
 
+/// Serialized inventory or evaluation report. CLI orchestration assembles
+/// inspect reports, rules::check assembles current checks, and upgrade::upgrade_report
+/// assembles upgrade advice. [`Report::finish`] derives counts and exits.
 #[derive(Clone, Debug, Serialize)]
 pub struct Report {
     pub schema_version: u32,
@@ -223,43 +247,4 @@ pub struct Report {
     pub counts: Counts,
     pub policy: Policy,
     pub exit_code: u8,
-}
-
-impl Report {
-    pub fn finish(&mut self) {
-        self.results
-            .sort_by(|a, b| (&a.subject, &a.rule_id).cmp(&(&b.subject, &b.rule_id)));
-        self.counts = Counts::default();
-        self.exit_code = 0;
-        for result in &self.results {
-            if result.suppression.is_some() {
-                self.counts.suppressed += 1;
-                continue;
-            }
-            match result.outcome {
-                Outcome::Pass => self.counts.passed += 1,
-                Outcome::Unknown => {
-                    self.counts.unknown += 1;
-                    if self.policy.deny_unknown {
-                        self.exit_code = 1;
-                    }
-                }
-                Outcome::NotApplicable => self.counts.not_applicable += 1,
-                Outcome::Skipped => self.counts.skipped += 1,
-                Outcome::Finding => match result.severity {
-                    Some(Severity::Error) => {
-                        self.counts.errors += 1;
-                        self.exit_code = 1;
-                    }
-                    Some(Severity::Warning) => {
-                        self.counts.warnings += 1;
-                        if self.policy.deny_warnings {
-                            self.exit_code = 1;
-                        }
-                    }
-                    _ => self.counts.info += 1,
-                },
-            }
-        }
-    }
 }

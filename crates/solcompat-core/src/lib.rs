@@ -1,7 +1,17 @@
 //! Immutable evidence, validated compatibility data, and pure rule evaluation.
+pub mod catalog;
 pub mod data;
 pub mod model;
+mod report;
+pub use report::Verdict;
+mod evaluation;
 pub mod rules;
+mod signals;
+mod target;
+pub mod upgrade;
+mod version;
+pub use signals::SourceSignal;
+pub use upgrade::upgrade_report;
 
 pub use data::Dataset;
 pub use model::*;

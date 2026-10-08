@@ -56,7 +56,18 @@
             "declared",
             "locked",
             "observed",
-            "asserted"
+            "asserted",
+            "resolution",
+            "metadata-resolution",
+            "observed-rpc",
+            "unresolved-rpc",
+            "unresolved-rust",
+            "anchor-cpi-context-account-info",
+            "anchor-discriminator-method",
+            "pinocchio-account-info",
+            "pinocchio-immutable-entrypoint",
+            "pinocchio-mutable-entrypoint",
+            "pinocchio-pubkey"
           ]
         },
         "digest": {
