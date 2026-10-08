@@ -1,4 +1,4 @@
-use solcompat_core::{Outcome, Report, Severity};
+use solcompat_core::{Outcome, Report, Severity, Verdict};
 use std::{ffi::OsString, fmt::Write};
 
 const RESET: &str = "\x1b[0m";
@@ -18,7 +18,11 @@ fn paint(value: &str, color: &str, enabled: bool) -> String {
 }
 
 pub fn error(message: &str, color: bool) -> String {
-    format!("{} — {message}", paint("ERROR", BOLD_RED, color))
+    format!(
+        "{} — {message}",
+        paint("ERROR", BOLD_RED, color),
+        message = one_line(message)
+    )
 }
 
 // Prevent untrusted manifest/config text from injecting terminal controls or fake rows.
@@ -86,34 +90,22 @@ pub fn report(report: &Report, detailed: bool, hint: &str, color: bool) -> Strin
         }
     )
     .unwrap();
-    writeln!(out, "Target: {}", report.target).unwrap();
+    writeln!(out, "Target: {}", one_line(&report.target)).unwrap();
     if report.command != "inspect" {
-        let (verdict, verdict_color) = if report.command == "upgrade" && report.counts.errors > 0 {
-            ("BREAKING CHANGES DETECTED", BOLD_RED)
-        } else if report.command == "upgrade" && report.counts.warnings > 0 {
-            ("UPGRADE REVIEW NEEDED", BOLD_YELLOW)
-        } else if report.counts.errors > 0 {
-            ("INCOMPATIBLE FOR CHECKED RULES", BOLD_RED)
-        } else if (report.counts.unknown > 0 || report.counts.skipped > 0)
-            && report.policy.deny_unknown
-        {
-            ("FAILED POLICY — INPUT REQUIRED", BOLD_RED)
-        } else if report.counts.unknown > 0 || report.counts.skipped > 0 {
-            ("INCOMPLETE", BOLD_YELLOW)
-        } else if report.counts.warnings > 0 && report.policy.deny_warnings {
-            ("FAILED POLICY — WARNINGS DENIED", BOLD_RED)
-        } else if report.counts.warnings > 0 {
-            ("PASSED WITH WARNINGS", BOLD_YELLOW)
-        } else if report.counts.info > 0 {
-            ("PASSED WITH NOTES", BOLD_CYAN)
-        } else if report.counts.suppressed > 0 {
-            ("REVIEW SUPPRESSIONS", BOLD_MAGENTA)
-        } else if !has_visible_results && report.command == "upgrade" {
-            ("NO APPLICABLE UPGRADE ADVICE", DIM)
-        } else if !has_visible_results {
-            ("NO APPLICABLE CHECKS", DIM)
-        } else {
-            ("COMPATIBLE FOR CHECKED RULES", BOLD_GREEN)
+        let (verdict, verdict_color) = match report.verdict() {
+            Verdict::Inventory => ("INVENTORY", DIM),
+            Verdict::BreakingChanges => ("BREAKING CHANGES DETECTED", BOLD_RED),
+            Verdict::UpgradeReview => ("UPGRADE REVIEW NEEDED", BOLD_YELLOW),
+            Verdict::Incompatible => ("INCOMPATIBLE FOR CHECKED RULES", BOLD_RED),
+            Verdict::InputPolicyFailure => ("FAILED POLICY — INPUT REQUIRED", BOLD_RED),
+            Verdict::Incomplete => ("INCOMPLETE", BOLD_YELLOW),
+            Verdict::WarningPolicyFailure => ("FAILED POLICY — WARNINGS DENIED", BOLD_RED),
+            Verdict::Warnings => ("PASSED WITH WARNINGS", BOLD_YELLOW),
+            Verdict::Notes => ("PASSED WITH NOTES", BOLD_CYAN),
+            Verdict::Suppressions => ("REVIEW SUPPRESSIONS", BOLD_MAGENTA),
+            Verdict::NoUpgradeAdvice => ("NO APPLICABLE UPGRADE ADVICE", DIM),
+            Verdict::NoChecks => ("NO APPLICABLE CHECKS", DIM),
+            Verdict::Compatible => ("COMPATIBLE FOR CHECKED RULES", BOLD_GREEN),
         };
         writeln!(out, "Verdict: {}", paint(verdict, verdict_color, color)).unwrap();
         writeln!(

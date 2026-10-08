@@ -1060,3 +1060,101 @@ fn pinocchio_source_syntax_is_checked_against_resolved_release() {
         .iter()
         .any(|evidence| evidence["pointer"] == "/source:1"));
 }
+
+#[cfg(unix)]
+#[test]
+fn build_recollects_created_lockfile_and_reports_timeout_failure() {
+    use std::os::unix::fs::PermissionsExt;
+    let project = Temp::new();
+    fs::create_dir(project.0.join("src")).unwrap();
+    fs::write(
+        project.0.join("Cargo.toml"),
+        "[package]\nname='example'\nversion='0.1.0'\n[dependencies]\nanchor-lang='0.31'\n",
+    )
+    .unwrap();
+    fs::write(project.0.join("src/lib.rs"), "#[program]\nmod example {}\n").unwrap();
+    fs::write(
+        project.0.join("Anchor.toml"),
+        "[toolchain]\nanchor_version='0.31.1'\n",
+    )
+    .unwrap();
+    assert_eq!(
+        rule(&report(&run(&project.0, &["--format", "json"])), "SC003")["outcome"],
+        "unknown"
+    );
+    let bin = project.0.join("bin");
+    fs::create_dir(&bin).unwrap();
+    let anchor = bin.join("anchor");
+    fs::write(&anchor,"#!/bin/sh\ncat > Cargo.lock <<'LOCK'\nversion=3\n[[package]]\nname='example'\nversion='0.1.0'\ndependencies=['anchor-lang']\n[[package]]\nname='anchor-lang'\nversion='0.31.1'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nLOCK\n").unwrap();
+    fs::set_permissions(&anchor, fs::Permissions::from_mode(0o755)).unwrap();
+    let invoke = || {
+        Command::new(env!("CARGO_BIN_EXE_solcompat"))
+            .args([
+                "check",
+                "--build",
+                "--build-timeout-seconds",
+                "1",
+                "--format",
+                "json",
+                "--path",
+            ])
+            .arg(&project.0)
+            .env("PATH", format!("{}:/bin", bin.display()))
+            .output()
+            .unwrap()
+    };
+    let data = report(&invoke());
+    assert_eq!(rule(&data, "SC003")["outcome"], "pass");
+    assert_eq!(rule(&data, "SC100")["outcome"], "pass");
+    assert!(rule(&data, "SC003")["evidence"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|ev| ev["path"] == "Cargo.lock" && ev["kind"] == "resolution"));
+    fs::write(&anchor, "#!/bin/sh\n/bin/sleep 30\n").unwrap();
+    let started = std::time::Instant::now();
+    let output = invoke();
+    assert_eq!(output.status.code(), Some(1));
+    assert!(started.elapsed() < std::time::Duration::from_secs(3));
+    assert!(rule(&report(&output), "SC100")["explanation"]
+        .as_str()
+        .unwrap()
+        .contains("timed out after 1 seconds"));
+}
+
+#[test]
+fn build_rejects_stale_metadata_and_invalid_timeout_options() {
+    for args in [
+        vec!["check", "--build", "--cargo-metadata", "snapshot.json"],
+        vec!["check", "--build-timeout-seconds", "1"],
+        vec!["check", "--build", "--build-timeout-seconds", "0"],
+    ] {
+        let output = Command::new(env!("CARGO_BIN_EXE_solcompat"))
+            .args(args)
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(2));
+    }
+}
+
+#[test]
+fn terminal_target_and_error_labels_escape_control_characters() {
+    let project = Temp::copy_fixture("rpc-v1-pass");
+    let label = "target\nFAKE\u{1b}[31m";
+    fs::write(
+        project.0.join("target.json"),
+        json!({"schema_version":1,"id":label,"artifact_policies":[]}).to_string(),
+    )
+    .unwrap();
+    let output = run(
+        &project.0,
+        &["--target-file", "target.json", "--color", "never"],
+    );
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(!text.contains('\u{1b}'));
+    assert!(!text.contains("\nFAKE"));
+    let error = run(&project.0, &["--target", label, "--color", "never"]);
+    let text = String::from_utf8(error.stderr).unwrap();
+    assert!(!text.contains('\u{1b}'));
+    assert!(!text.contains("\nFAKE"));
+}

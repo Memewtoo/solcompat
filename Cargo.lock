@@ -309,7 +309,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "semver",
  "serde",
  "serde_json",
  "solcompat-core",
